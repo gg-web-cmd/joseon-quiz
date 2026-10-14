@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>초등 5학년 사회 퀴즈 - 빛나는 조선의 문화</title>
+  <!-- 눈이 편안하고 가독성이 뛰어난 한국어 웹폰트 (Pretendard) 적용 -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  
+  <style>
+    /* ========================================================
+       1. 기본 스타일 및 테마 변수 (교실 TV 및 모바일 최적화)
+       ======================================================== */
+    :root {
+      --primary-color: #1e3a8a;      /* 조선의 깊은 청색 (신뢰와 역사 느낌) */
+      --primary-hover: #172554;
+      --accent-color: #d97706;       /* 따뜻한 황금/호박색 포인트 */
+      --correct-color: #16a34a;      /* 정답 녹색 (선명한 색상) */
+      --correct-bg: #dcfce7;
+      --wrong-color: #dc2626;        /* 오답 적색 */
+      --wrong-bg: #fee2e2;
+      --card-bg: #ffffff;
+      --bg-color: #f1f5f9;           /* 편안하고 눈부심 없는 연한 회색/하늘색 배경 */
+      --text-main: #0f172a;          /* 교실 뒤에서도 또렷한 짙은 남흑색 */
+      --text-sub: #475569;
+      --border-radius: 20px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    /* 전체 앱을 감싸는 메인 컨테이너 */
+    .app-container {
+      width: 100%;
+      max-width: 820px; /* 대형 TV에서도 너무 퍼지지 않고 집중도 높은 크기 */
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid #e2e8f0;
+    }
+
+    /* 상단 헤더 영역 (제목 & 진행도) */
+    .quiz-header {
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+
+    .badge-tag {
+      display: inline-block;
+      background-color: #e0e7ff;
+      color: var(--primary-color);
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      margin-bottom: 10px;
+    }
+
+    .quiz-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--primary-color);
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+
+    /* 진행 바 (몇 문제 풀었는지 한눈에 보여주는 막대) */
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 14px;
+      background-color: #e2e8f0;
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #1e3a8a);
+      width: 10%;
+      transition: width 0.4s ease;
+      border-radius: 9999px;
+    }
+
+    /* ========================================================
+       2. 문제 영역 스타일 (크고 선명한 글자)
+       ======================================================== */
+    .question-section {
+      margin-bottom: 24px;
+    }
+
+    .question-number {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--accent-color);
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 1.75rem; /* 교실 TV에서도 멀리서 볼 수 있는 큼직한 폰트 */
+      font-weight: 800;
+      line-height: 1.45;
+      color: var(--text-main);
+      word-break: keep-all; /* 한글 단어가 중간에 끊기지 않도록 설정 */
+    }
+
+    /* ========================================================
+       3. 4지선다 보기 버튼 스타일
+       ======================================================== */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .option-btn {
+      width: 100%;
+      min-height: 64px; /* 터치 및 클릭하기 쉬운 넉넉한 높이 */
+      background-color: #f8fafc;
+      border: 2.5px solid #cbd5e1;
+      border-radius: 16px;
+      padding: 14px 20px;
+      font-size: 1.35rem; /* 또렷하고 읽기 편한 글씨 */
+      font-weight: 700;
+      color: var(--text-main);
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: #eff6ff;
+      border-color: #3b82f6;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+
+    /* 보기 번호 동그라미 (①, ②, ③, ④) */
+    .option-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      background-color: #e2e8f0;
+      color: #334155;
+      border-radius: 50%;
+      margin-right: 16px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .option-btn:hover:not(:disabled) .option-num {
+      background-color: #3b82f6;
+      color: #ffffff;
+    }
+
+    /* 정답 상태 스타일 */
+    .option-btn.correct {
+      background-color: var(--correct-bg) !important;
+      border-color: var(--correct-color) !important;
+      color: #14532d !important;
+      font-weight: 800;
+    }
+    .option-btn.correct .option-num {
+      background-color: var(--correct-color);
+      color: #ffffff;
+    }
+
+    /* 오답 상태 스타일 */
+    .option-btn.wrong {
+      background-color: var(--wrong-bg) !important;
+      border-color: var(--wrong-color) !important;
+      color: #7f1d1d !important;
+    }
+    .option-btn.wrong .option-num {
+      background-color: var(--wrong-color);
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* ========================================================
+       4. 정답 피드백 및 쉬운 해설 상자
+       ======================================================== */
+    .explanation-box {
+      display: none;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .explanation-box.is-correct {
+      background-color: #f0fdf4;
+      border: 2px solid #86efac;
+    }
+
+    .explanation-box.is-wrong {
+      background-color: #fef2f2;
+      border: 2px solid #fca5a5;
+    }
+
+    .feedback-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .explanation-box.is-correct .feedback-title {
+      color: var(--correct-color);
+    }
+
+    .explanation-box.is-wrong .feedback-title {
+      color: var(--wrong-color);
+    }
+
+    .feedback-desc {
+      font-size: 1.25rem;
+      line-height: 1.55;
+      color: #334155;
+      word-break: keep-all;
+    }
+
+    /* ========================================================
+       5. 컨트롤 버튼 (다음 문제, 시작, 다시 풀기)
+       ======================================================== */
+    .btn-action {
+      width: 100%;
+      min-height: 64px;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: #ffffff;
+      border: none;
+      border-radius: 16px;
+      font-size: 1.45rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-action:hover {
+      background: linear-gradient(135deg, #172554, #1d4ed8);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+    }
+
+    .btn-action:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* ========================================================
+       6. 결과 화면 스타일
+       ======================================================== */
+    .result-view {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .result-emoji {
+      font-size: 5rem;
+      margin-bottom: 12px;
+    }
+
+    .result-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--primary-color);
+      margin-bottom: 12px;
+    }
+
+    .score-badge-box {
+      background-color: #f8fafc;
+      border: 3px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 24px;
+      display: inline-block;
+      margin-bottom: 24px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .score-value {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: var(--accent-color);
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+
+    .score-detail {
+      font-size: 1.35rem;
+      color: var(--text-sub);
+      font-weight: 700;
+    }
+
+    .result-comment {
+      font-size: 1.45rem;
+      font-weight: 700;
+      line-height: 1.6;
+      color: var(--text-main);
+      margin-bottom: 32px;
+      word-break: keep-all;
+    }
+
+    /* ========================================================
+       7. 반응형 미디어 쿼리 (스마트폰 & TV 적응)
+       ======================================================== */
+    /* 모바일 작은 화면 대응 */
+    @media (max-width: 600px) {
+      .app-container {
+        padding: 20px 16px;
+      }
+      .quiz-title {
+        font-size: 1.45rem;
+      }
+      .question-text {
+        font-size: 1.4rem;
+      }
+      .option-btn {
+        min-height: 56px;
+        font-size: 1.15rem;
+        padding: 12px 14px;
+      }
+      .option-num {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+        margin-right: 12px;
+      }
+      .feedback-desc {
+        font-size: 1.1rem;
+      }
+      .btn-action {
+        min-height: 56px;
+        font-size: 1.25rem;
+      }
+      .score-value {
+        font-size: 2.8rem;
+      }
+      .result-title {
+        font-size: 1.8rem;
+      }
+    }
+
+    /* 큰 교실 TV나 고해상도 전자칠판 대응 */
+    @media (min-width: 1200px) {
+      .question-text {
+        font-size: 2rem;
+      }
+      .option-btn {
+        font-size: 1.5rem;
+        min-height: 72px;
+      }
+      .feedback-desc {
+        font-size: 1.35rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 메인 퀴즈 웹앱 카드 -->
+  <main class="app-container" role="main" aria-label="조선 시대 문화 퀴즈">
+
+    <!-- 퀴즈 진행 화면 -->
+    <div id="quizScreen">
+      <!-- 상단 헤더: 과목 표기 및 진도율 -->
+      <header class="quiz-header">
+        <span class="badge-tag">초등 5학년 사회 📜 조선 시대의 문화</span>
+        <h1 class="quiz-title">도전! 조선 문화 퀴즈 탐험대</h1>
+        
+        <div class="progress-info">
+          <span id="progressText">문제 1 / 10</span>
+          <span id="currentScoreText">현재 점수: 0점</span>
+        </div>
+        <div class="progress-bar-bg" aria-hidden="true">
+          <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+      </header>
+
+      <!-- 문제 출력 구역 -->
+      <section class="question-section">
+        <div class="question-number" id="questionBadge">문제 1번</div>
+        <h2 class="question-text" id="questionText">문제를 불러오는 중입니다...</h2>
+      </section>
+
+      <!-- 4지선다 보기 버튼 목록 -->
+      <section class="options-grid" id="optionsContainer" aria-label="보기 목록">
+        <!-- 자바스크립트로 보기 버튼이 동적으로 생성됩니다 -->
+      </section>
+
+      <!-- 정답 및 해설 알림 상자 -->
+      <section class="explanation-box" id="explanationBox" aria-live="polite">
+        <div class="feedback-title" id="feedbackTitle">
+          <span id="feedbackIcon">⭕</span>
+          <span id="feedbackResultText">정답입니다!</span>
+        </div>
+        <p class="feedback-desc" id="explanationText">
+          여기에 문제에 대한 쉬운 해설이 제공됩니다.
+        </p>
+      </section>
+
+      <!-- 다음 문제로 넘어가기 버튼 -->
+      <button type="button" class="btn-action" id="nextBtn" style="display: none;">
+        <span>다음 문제 풀기</span>
+        <span aria-hidden="true">➡️</span>
+      </button>
+    </div>
+
+    <!-- 결과 화면 (10문제 완료 시 노출) -->
+    <div id="resultScreen" class="result-view" aria-live="polite">
+      <div class="result-emoji" id="resultEmoji">🏆</div>
+      <h2 class="result-title">퀴즈 탐험 완료!</h2>
+
+      <div class="score-badge-box">
+        <div class="score-value" id="finalScoreText">100점</div>
+        <div class="score-detail" id="finalCountText">10문제 중 10문제 정답!</div>
+      </div>
+
+      <p class="result-comment" id="resultComment">
+        훌륭해요! 조선 시대의 찬란한 문화유산을 완벽하게 이해하고 있군요!
+      </p>
+
+      <button type="button" class="btn-action" id="restartBtn">
+        <span aria-hidden="true">🔄</span>
+        <span>처음부터 다시 풀기</span>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- ========================================================
+       8. 퀴즈 데이터 및 상호작용 자바스크립트 로직
+       ======================================================== -->
+  <script>
+    /*
+     * [초등 5학년 사회과 교육과정 연계] 조선 시대 문화 퀴즈 데이터 (10문제)
+     * - question: 질문 내용
+     * - options: 4지선다 보기 배열
+     * - answerIndex: 정답 번호의 인덱스 (0, 1, 2, 3)
+     * - explanation: 초등학생 눈높이에 맞춘 1~2문장의 쉬운 해설
+     */
+    const quizData = [
+      {
+        question: "세종대왕이 글자를 몰라 고통받는 백성들을 가엾게 여겨 직접 만든 우리나라 고유의 글자는 무엇일까요?",
+        options: ["한자", "이두", "훈민정음 (한글)", "가림토"],
+        answerIndex: 2,
+        explanation: "훈민정음은 '백성을 가르치는 바른 소리'라는 뜻으로, 세종대왕이 백성들이 쉽게 배우고 쓸 수 있도록 만든 자랑스러운 우리 글자입니다."
+      },
+      {
+        question: "농사에 가장 중요한 비의 양을 과학적으로 측정하기 위해 조선 시대에 세계 최초로 만든 발명품은 무엇일까요?",
+        options: ["측우기", "앙부일구", "혼천의", "수표"],
+        answerIndex: 0,
+        explanation: "측우기는 쇠나 구리로 만든 둥근 통에 빗물을 받아 깊이를 재던 기구로, 서양보다 약 200년이나 앞서 만들어졌습니다."
+      },
+      {
+        question: "오목한 가마솥 모양을 하고 있으며, 햇빛 그림자의 위치를 보고 시간과 계절을 알 수 있게 만든 해시계의 이름은 무엇일까요?",
+        options: ["자격루", "앙부일구", "일성정시의", "규표"],
+        answerIndex: 1,
+        explanation: "앙부일구는 '하늘을 우러러보는 솥 모양의 해시계'라는 뜻으로, 글자를 모르는 백성들을 위해 12지신 동물 그림으로 시간을 표시했습니다."
+      },
+      {
+        question: "세종대왕의 명을 받아 과학자 장영실 등이 만든 시계로, 물의 흐름을 이용해 정해진 시간마다 저절로 종과 북을 쳐서 시간을 알려주던 물시계는 무엇일까요?",
+        options: ["자격루", "앙부일구", "풍기대", "혼천의"],
+        answerIndex: 0,
+        explanation: "자격루는 물이 차오르는 힘으로 구슬을 굴려 인형이 스스로 종과 북을 울리게 만든 세계 최고 수준의 자동 물시계입니다."
+      },
+      {
+        question: "조선 후기 백성들의 일상적인 삶과 풍습(씨름, 서당, 빨래터 등)을 생생하고 재미있게 그린 그림을 무엇이라고 부를까요?",
+        options: ["산수화", "풍속화", "민화", "초상화"],
+        answerIndex: 1,
+        explanation: "풍속화는 당시 일반 백성들의 생생한 생활 모습과 감정을 솔직하고 친근하게 담아낸 소중한 그림입니다."
+      },
+      {
+        question: "서민들의 활기찬 모습을 해학적이고 친근하게 그려낸 화가로, 대표작으로 '씨름', '서당', '대장간' 등이 있는 조선 후기의 대표 화가는 누구일까요?",
+        options: ["신윤복", "김홍도", "정선", "안견"],
+        answerIndex: 1,
+        explanation: "단원 김홍도는 서민들의 땀방울과 웃음을 따뜻한 시선과 살아있는 선으로 표현한 조선 최고의 풍속 화가입니다."
+      },
+      {
+        question: "조선 시대의 뛰어난 여성 예술가이자 학자로, 주변의 풀과 벌레, 꽃과 나비 등을 관찰하여 섬세하게 그린 '초충도'로 유명한 인물은 누구일까요?",
+        options: ["허난설헌", "신사임당", "황진이", "김만덕"],
+        answerIndex: 1,
+        explanation: "신사임당은 자연을 사랑하는 따뜻한 눈으로 마당의 풀과 벌레들을 사실적이고 아름답게 화폭에 담아냈습니다."
+      },
+      {
+        question: "조선 시대 선비들의 청렴하고 소박하며 순수한 정신세계를 잘 나타내어 조선 전반에 걸쳐 널리 사랑받은 대표적인 도자기는 무엇일까요?",
+        options: ["고려청자", "백자", "토기", "녹청자"],
+        answerIndex: 1,
+        explanation: "조선백자는 화려한 색채 대신 맑고 깨끗한 흰빛을 띠어 검소함과 절제미를 중요하게 여긴 유교 정신을 잘 보여줍니다."
+      },
+      {
+        question: "태조부터 철종까지 25대 472년간 조선 왕들의 통치와 국가의 모든 역사를 상세하고 공정하게 기록하여 유네스코 세계기록유산에 등재된 방대한 역사책은 무엇일까요?",
+        options: ["삼국사기", "고려사", "조선왕조실록", "동국통감"],
+        answerIndex: 2,
+        explanation: "조선왕조실록은 왕조차도 마음대로 읽거나 고칠 수 없을 만큼 엄격하고 정직하게 역사를 기록하여 세계적으로 높은 가치를 인정받고 있습니다."
+      },
+      {
+        question: "조선 제22대 임금 정조가 아버지 사도세자를 기리고 상업을 발전시키기 위해 축조한 성곽으로, 정약용이 발명한 거중기를 사용하여 지은 세계문화유산은 무엇일까요?",
+        options: ["남한산성", "북한산성", "수원 화성", "진주성"],
+        answerIndex: 2,
+        explanation: "수원 화성은 정조의 효심과 개혁 의지, 그리고 정약용의 뛰어난 과학 기술(거중기)이 결합된 조선 성곽 건축의 꽃입니다."
+      }
+    ];
+
+    /* ========================================================
+     * 사운드 효과 (Web Audio API를 활용한 가벼운 자체 효과음)
+     * - 별도의 외부 mp3 파일 없이도 교실에서 맑은 차임벨 재생 가능
+     * ======================================================== */
+    const SoundManager = {
+      audioCtx: null,
+
+      init() {
+        if (!this.audioCtx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.audioCtx = new AudioContext();
+          }
+        }
+      },
+
+      // 정답 효과음 (맑고 경쾌한 실로폰 '솔-도' 소리)
+      playCorrect() {
+        this.init();
+        if (!this.audioCtx) return;
+
+        const ctx = this.audioCtx;
+        if (ctx.state === 'suspended') ctx.resume();
+
+        const now = ctx.currentTime;
+        const notes = [783.99, 1046.50]; // G5, C6 음높이
+
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+
+          gain.gain.setValueAtTime(0.2, now + idx * 0.12);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.35);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc.start(now + idx * 0.12);
+          osc.stop(now + idx * 0.12 + 0.35);
+        });
+      },
+
+      // 오답 효과음 (부드러운 저음 알림)
+      playWrong() {
+        this.init();
+        if (!this.audioCtx) return;
+
+        const ctx = this.audioCtx;
+        if (ctx.state === 'suspended') ctx.resume();
+
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(260, now);
+        osc.frequency.exponentialRampToValueAtTime(180, now + 0.25);
+
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.25);
+      }
+    };
+
+    /* ========================================================
+     * 퀴즈 애플리케이션 상태 관리 변수들
+     * ======================================================== */
+    let currentQuestionIndex = 0; // 현재 풀고 있는 문제 번호 (0부터 시작)
+    let score = 0;                // 맞힌 문제 수
+    let answered = false;         // 현재 문제의 답을 선택했는지 여부
+
+    // 화면 요소(DOM) 가져오기
+    const quizScreen = document.getElementById("quizScreen");
+    const resultScreen = document.getElementById("resultScreen");
+
+    const progressText = document.getElementById("progressText");
+    const currentScoreText = document.getElementById("currentScoreText");
+    const progressBar = document.getElementById("progressBar");
+
+    const questionBadge = document.getElementById("questionBadge");
+    const questionText = document.getElementById("questionText");
+    const optionsContainer = document.getElementById("optionsContainer");
+
+    const explanationBox = document.getElementById("explanationBox");
+    const feedbackIcon = document.getElementById("feedbackIcon");
+    const feedbackResultText = document.getElementById("feedbackResultText");
+    const explanationText = document.getElementById("explanationText");
+
+    const nextBtn = document.getElementById("nextBtn");
+    const restartBtn = document.getElementById("restartBtn");
+
+    const finalScoreText = document.getElementById("finalScoreText");
+    const finalCountText = document.getElementById("finalCountText");
+    const resultEmoji = document.getElementById("resultEmoji");
+    const resultComment = document.getElementById("resultComment");
+
+    // 보기 번호 표시용 기호 배열
+    const numberSymbols = ["①", "②", "③", "④"];
+
+    /*
+     * [함수 1] 현재 문제를 화면에 표시하는 함수
+     */
+    function loadQuestion() {
+      answered = false;
+      const currentQuiz = quizData[currentQuestionIndex];
+
+      // 상단 헤더 진행 정보 갱신
+      const questionNum = currentQuestionIndex + 1;
+      progressText.textContent = `문제 ${questionNum} / ${quizData.length}`;
+      currentScoreText.textContent = `현재 점수: ${score * 10}점`;
+      
+      const progressPercent = (questionNum / quizData.length) * 100;
+      progressBar.style.width = `${progressPercent}%`;
+
+      // 문제 번호 및 질문 본문 출력
+      questionBadge.textContent = `문제 ${questionNum}번`;
+      questionText.textContent = currentQuiz.question;
+
+      // 보기 영역 초기화 후 4개 버튼 생성
+      optionsContainer.innerHTML = "";
+      currentQuiz.options.forEach((optionString, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "option-btn";
+        button.setAttribute("aria-label", `보기 ${index + 1}번: ${optionString}`);
+        
+        button.innerHTML = `
+          <span class="option-num">${numberSymbols[index]}</span>
+          <span class="option-text">${optionString}</span>
+        `;
+
+        // 보기를 클릭했을 때 답안 검사 실행
+        button.addEventListener("click", () => handleSelectOption(index));
+        optionsContainer.appendChild(button);
+      });
+
+      // 해설 박스와 다음 버튼 숨기기
+      explanationBox.style.display = "none";
+      explanationBox.className = "explanation-box";
+      nextBtn.style.display = "none";
+    }
+
+    /*
+     * [함수 2] 사용자가 보기를 클릭했을 때 실행되는 채점 함수
+     */
+    function handleSelectOption(selectedIndex) {
+      if (answered) return; // 이미 답을 골랐다면 추가 클릭 방지
+      answered = true;
+
+      const currentQuiz = quizData[currentQuestionIndex];
+      const optionButtons = optionsContainer.querySelectorAll(".option-btn");
+      const isCorrect = (selectedIndex === currentQuiz.answerIndex);
+
+      // 모든 보기 버튼 비활성화 (추가 터치 방지)
+      optionButtons.forEach(btn => btn.disabled = true);
+
+      // 정답/오답 스타일 및 효과음 적용
+      if (isCorrect) {
+        score++;
+        currentScoreText.textContent = `현재 점수: ${score * 10}점`;
+        optionButtons[selectedIndex].classList.add("correct");
+        
+        explanationBox.className = "explanation-box is-correct";
+        feedbackIcon.textContent = "⭕";
+        feedbackResultText.textContent = "참 잘했어요! 정답입니다!";
+        
+        SoundManager.playCorrect(); // 딩동댕 소리 재생
+      } else {
+        optionButtons[selectedIndex].classList.add("wrong");
+        // 맞혀야 했던 진짜 정답을 함께 초록색으로 표시하여 학습 도움
+        optionButtons[currentQuiz.answerIndex].classList.add("correct");
+
+        explanationBox.className = "explanation-box is-wrong";
+        feedbackIcon.textContent = "❌";
+        feedbackResultText.textContent = `아쉬워요! 정답은 ${numberSymbols[currentQuiz.answerIndex]}번 입니다.`;
+        
+        SoundManager.playWrong(); // 부드러운 오답음 재생
+      }
+
+      // 쉬운 1~2문장 해설 출력
+      explanationText.textContent = currentQuiz.explanation;
+      explanationBox.style.display = "block";
+
+      // 마지막 문제인지에 따라 다음 버튼 문구 조정
+      if (currentQuestionIndex === quizData.length - 1) {
+        nextBtn.innerHTML = `<span>최종 결과 확인하기</span><span aria-hidden="true"> 🏆</span>`;
+      } else {
+        nextBtn.innerHTML = `<span>다음 문제 풀기</span><span aria-hidden="true"> ➡️</span>`;
+      }
+      nextBtn.style.display = "flex";
+
+      // 모바일이나 작은 화면에서 해설이 화면 밖으로 밀려나지 않도록 부드럽게 스크롤
+      setTimeout(() => {
+        explanationBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    }
+
+    /*
+     * [함수 3] 다음 버튼을 눌렀을 때 다음 문제로 가거나 결과를 보여주는 함수
+     */
+    function handleNext() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < quizData.length) {
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    /*
+     * [함수 4] 10문제를 모두 풀었을 때 최종 성적표를 보여주는 함수
+     */
+    function showResults() {
+      quizScreen.style.display = "none";
+      resultScreen.style.display = "block";
+
+      const finalScore = score * 10;
+      finalScoreText.textContent = `${finalScore}점`;
+      finalCountText.textContent = `${quizData.length}문제 중 ${score}문제 정답!`;
+
+      // 획득 점수에 따른 맞춤형 칭찬과 격려 코멘트
+      if (finalScore === 100) {
+        resultEmoji.textContent = "👑";
+        resultComment.textContent = "만점입니다! 여러분은 자랑스러운 '조선 시대 문화 박사'입니다! 최고예요! 👏";
+      } else if (finalScore >= 80) {
+        resultEmoji.textContent = "🎉";
+        resultComment.textContent = "아주 훌륭해요! 조선의 과학과 예술 문화를 깊이 이해하고 있네요! 멋져요! 😊";
+      } else if (finalScore >= 60) {
+        resultEmoji.textContent = "💡";
+        resultComment.textContent = "잘했어요! 조금만 더 복습하면 다음엔 백점을 맞을 수 있을 거예요! 화이팅! 👍";
+      } else {
+        resultEmoji.textContent = "🌱";
+        resultComment.textContent = "조선의 문화를 탐험해 본 소중한 시간이었어요. 다시 한 번 도전해 볼까요? 💪";
+      }
+    }
+
+    /*
+     * [함수 5] 처음부터 다시 풀기 함수
+     */
+    function handleRestart() {
+      currentQuestionIndex = 0;
+      score = 0;
+      resultScreen.style.display = "none";
+      quizScreen.style.display = "block";
+      loadQuestion();
+    }
+
+    // 이벤트 리스너 등록
+    nextBtn.addEventListener("click", handleNext);
+    restartBtn.addEventListener("click", handleRestart);
+
+    // 웹앱 최초 실행 시 1번 문제 로드
+    window.addEventListener("DOMContentLoaded", () => {
+      loadQuestion();
+    });
+  </script>
+</body>
+</html>

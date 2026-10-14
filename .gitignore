@@ -1,0 +1,8 @@
+# 테스트 및 임시 폴더
+.playwright-mcp/
+node_modules/
+*.log
+
+# 운영체제 생성 파일
+.DS_Store
+Thumbs.db
